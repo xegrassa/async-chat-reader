@@ -1,0 +1,3 @@
+;HOST = minechat.dvmn.org
+port = 5000
+;HISTORY = /home/egrassa/PycharmProjects/async-chat-reader/chatlog.txt
