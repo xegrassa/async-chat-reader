@@ -1,10 +1,10 @@
 import configargparse
 
 
-p = configargparse.ArgParser(default_config_files='config')
-p.add_argument('--host', help='IP адресс чата с перипиской')
-p.add_argument('--port', help='port чата с перипиской')
-
-args = p.parse_args()
-
-print(args)
+def parse_args():
+    p = configargparse.ArgParser()
+    p.add_argument('--host', env_var='HOST', help='IP адресс чата с перипиской')
+    p.add_argument('--port', env_var='PORT', help='port чата с перипиской')
+    p.add_argument('--history', env_var='history', help='файл логов чата')
+    args = p.parse_args()
+    return args
