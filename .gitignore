@@ -3,3 +3,4 @@ venv
 z.py
 .env
 __pycache__
+*.log
