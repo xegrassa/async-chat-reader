@@ -1,0 +1,41 @@
+import asyncio
+import logging
+import os
+
+from dotenv import load_dotenv
+
+from cli import parse_args
+from core.logging import configure_logging
+
+
+async def write_to_chat(host, port):
+    logger = logging.getLogger('writer-minechar')
+    token = os.getenv('TOKEN')
+    reader, writer = await asyncio.open_connection(host, port)
+
+    data = await reader.readline()
+    logger.debug(data.decode())
+
+    message = token.encode() + b'\n'
+    writer.write(message)
+    logger.debug(message)
+    await writer.drain()
+
+    data = await reader.readline()
+    logger.debug(data.decode())
+    data = await reader.readline()
+    logger.debug(data.decode())
+
+    message = b'Hello Chat !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n'
+    writer.write(message)
+    logger.debug(message)
+    await writer.drain()
+    writer.close()
+
+
+if __name__ == '__main__':
+    configure_logging('writer-minechar')
+    load_dotenv()
+    args = parse_args()
+
+    asyncio.run(write_to_chat(args.host, 5050))

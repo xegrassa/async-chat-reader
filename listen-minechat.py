@@ -1,6 +1,6 @@
 import asyncio
 import datetime
-import os
+
 import aiofiles
 from dotenv import load_dotenv
 
@@ -21,22 +21,9 @@ async def read_chat(host, port, history):
         print(f'{message}')
 
 
-async def write_to_chat(host, port):
-    token = os.getenv('TOKEN')
-    reader, writer = await asyncio.open_connection(host, port)
-
-    writer.write(token.encode() + b'\n')
-    await writer.drain()
-
-    writer.write(b'Hello Chat !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n')
-    await writer.drain()
-    writer.close()
-
-
 if __name__ == '__main__':
     load_dotenv()
     args = parse_args()
     print(args)
 
-    # asyncio.run(read_chat(args.host, args.port, args.history))
-    asyncio.run(write_to_chat(args.host, 5050))
+    asyncio.run(read_chat(args.host, args.port, args.history))
