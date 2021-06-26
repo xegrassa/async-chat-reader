@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-
+import json
 from dotenv import load_dotenv
 
 from cli import parse_args
@@ -22,6 +22,9 @@ async def write_to_chat(host, port):
     await writer.drain()
 
     data = await reader.readline()
+    if json.loads(data) is None:
+        print('Неизвестный токен. Проверьте его или зарегистрируйте заново.')
+        return
     logger.debug(data.decode())
     data = await reader.readline()
     logger.debug(data.decode())
