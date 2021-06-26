@@ -8,9 +8,8 @@ from cli import parse_args
 from core.logging import configure_logging
 
 
-async def write_to_chat(host, port):
+async def write_to_chat(host, port, token):
     logger = logging.getLogger('writer-minechar')
-    token = os.getenv('TOKEN')
     reader, writer = await asyncio.open_connection(host, port)
 
     data = await reader.readline()
@@ -40,5 +39,6 @@ if __name__ == '__main__':
     configure_logging('writer-minechar')
     load_dotenv()
     args = parse_args()
+    token = os.getenv('TOKEN')
 
-    asyncio.run(write_to_chat(args.host, 5050))
+    asyncio.run(write_to_chat(args.host, 5050, token))
