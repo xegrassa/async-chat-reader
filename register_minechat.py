@@ -21,9 +21,9 @@ async def read_message(reader):
 
 async def register(reader, writer, name):
     await read_message(reader)
-    await submit_message(writer, '\n')
+    await submit_message(writer)
     await read_message(reader)
-    await submit_message(writer, name + '\n')
+    await submit_message(writer, name)
     message = await read_message(reader)
     _, token = json.loads(message).values()
     return token
@@ -34,7 +34,7 @@ async def authorise(host, port, token):
     reader, writer = await asyncio.open_connection(host, port)
 
     await read_message(reader)
-    await submit_message(writer, token + '\n')
+    await submit_message(writer, token)
 
     data = await read_message(reader)
     if json.loads(data) is None:
@@ -44,11 +44,11 @@ async def authorise(host, port, token):
     await read_message(reader)
 
 
-async def submit_message(writer, message: Union[str, bytes]):
+async def submit_message(writer, message: str = ''):
     logger = logging.getLogger(__name__)
-    send_message = message.encode() if isinstance(message, str) else message
-    writer.write(send_message)
+    send_message = message.replace('\n', '')
     logger.debug(send_message)
+    writer.write((send_message + '\n').encode())
     await writer.drain()
 
 
