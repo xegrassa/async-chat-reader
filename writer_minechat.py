@@ -7,9 +7,11 @@ from dotenv import load_dotenv
 from cli import parse_args
 from core.logging import configure_logging
 
+configure_logging(__name__)
+
 
 async def write_to_chat(host, port, token):
-    logger = logging.getLogger('writer-minechar')
+    logger = logging.getLogger(__name__)
     reader, writer = await asyncio.open_connection(host, port)
 
     data = await reader.readline()
@@ -36,7 +38,6 @@ async def write_to_chat(host, port, token):
 
 
 if __name__ == '__main__':
-    configure_logging('writer-minechar')
     load_dotenv()
     args = parse_args()
     token = os.getenv('TOKEN')
