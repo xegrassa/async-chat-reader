@@ -1,15 +1,38 @@
 import asyncio
 import json
 import logging
-from typing import Union
 
 from dotenv import load_dotenv
 
-from cli import parse_args_listen
+from cli import parse_args_write
 from core.logging import configure_logging
-from write2minechat import write2chat
 
 configure_logging(__name__)
+
+
+async def write2chat(message, host, port, token):
+    reader, writer = await asyncio.open_connection(host, port)
+
+    await read_message(reader)
+    await submit_message(writer, token)
+
+    data = await read_message(reader)
+    if json.loads(data) is None:
+        print('Неизвестный токен. Проверьте его или зарегистрируйте заново.')
+        return
+    await read_message(reader)
+
+    await submit_message(writer, message)
+
+
+async def register_chat(host, port, name):
+    reader, writer = await asyncio.open_connection(host, port)
+    token = await register(reader, writer, name)
+
+    with open('token.txt', 'w', encoding='utf-8') as f:
+        f.write(token)
+
+    await write2chat(host, port, token)
 
 
 async def read_message(reader):
@@ -52,18 +75,8 @@ async def submit_message(writer, message: str = ''):
     await writer.drain()
 
 
-async def register_chat(host, port, name):
-    reader, writer = await asyncio.open_connection(host, port)
-    token = await register(reader, writer, name)
-
-    with open('token.txt', 'w', encoding='utf-8') as f:
-        f.write(token)
-
-    await write2chat(host, port, token)
-
-
 if __name__ == '__main__':
     load_dotenv()
-    args = parse_args_listen()
-
-    asyncio.run(register_chat(args.host, 5050, 'Artem'))
+    args = parse_args_write()
+    print(args)
+    asyncio.run(write2chat(args.message, args.host, args.port, args.token))

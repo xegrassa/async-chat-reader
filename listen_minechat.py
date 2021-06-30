@@ -4,7 +4,7 @@ import datetime
 import aiofiles
 from dotenv import load_dotenv
 
-from cli import parse_args
+from cli import parse_args_listen
 
 
 async def read_chat(host, port, history):
@@ -23,7 +23,5 @@ async def read_chat(host, port, history):
 
 if __name__ == '__main__':
     load_dotenv()
-    args = parse_args()
-    print(args)
-
+    args = parse_args_listen()
     asyncio.run(read_chat(args.host, args.port, args.history))

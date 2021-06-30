@@ -1,10 +1,20 @@
 import configargparse
 
 
-def parse_args():
-    p = configargparse.ArgParser()
-    p.add_argument('--host', env_var='HOST', help='IP адресс чата с перипиской')
-    p.add_argument('--port', env_var='PORT', help='port чата с перипиской')
-    p.add_argument('--history', env_var='HISTORY', help='файл логов чата')
+def parse_args_listen():
+    p = configargparse.ArgParser(description='Скрипт для чтения и логгирования чата Devman')
+    p.add_argument('--host', env_var='HOST', help='IP адресс чата')
+    p.add_argument('--port', env_var='LISTEN_PORT', help='port чата')
+    p.add_argument('--history', env_var='HISTORY', help='Файл логов чата')
+    args = p.parse_args()
+    return args
+
+def parse_args_write():
+    p = configargparse.ArgParser(default_config_files=['token.txt'], description='Скрипт для отправки сообщения в чат Devman')
+    p.add_argument('message', help='Сообщение для чата')
+    p.add_argument('--host', env_var='HOST', help='IP адресс чата')
+    p.add_argument('--port', env_var='WRITE_PORT', help='port чата')
+    p.add_argument('--token', env_var='TOKEN', help='Токен')
+    p.add_argument('--name', help='Имя пользователя для регистрации')
     args = p.parse_args()
     return args
