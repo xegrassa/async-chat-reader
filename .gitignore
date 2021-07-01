@@ -5,3 +5,4 @@ z.py
 __pycache__
 *.log
 token.txt
+.python-version

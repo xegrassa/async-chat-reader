@@ -8,9 +8,10 @@ from cli import parse_args_listen
 
 
 async def read_chat(host, port, history):
+    reader, _ = await asyncio.open_connection(host, port)
+
     while True:
-        reader, _ = await asyncio.open_connection(host, port)
-        data = await reader.read(100)
+        data = await reader.readuntil(b'\n')
 
         message_text = data.decode()
         message_time = datetime.datetime.now().strftime('[%d.%m.%y %H:%M]')
