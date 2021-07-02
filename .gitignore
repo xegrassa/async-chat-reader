@@ -4,3 +4,5 @@ z.py
 .env
 __pycache__
 *.log
+token.txt
+.python-version
