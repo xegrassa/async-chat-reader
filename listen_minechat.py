@@ -4,7 +4,7 @@ import datetime
 import aiofiles
 from dotenv import load_dotenv
 
-from cli import parse_args_listen
+from core.cli import parse_args_listen
 
 
 async def read_chat(host, port, history):
