@@ -1,15 +1,24 @@
 # Асинхронное подключение к чату Девман
 
-## Чтение чата
+### Установка
+Клонируйте проект и установите зависимости командами ниже. Для работы требуется версия Python 3.8 + 
+```
+git clone https://github.com/xegrassa/async-chat-reader.git
+cd async-chat-reader
+pip install -r requirements.txt
+```
 
-Чтобы читать чат Девман запустите скрипт: 
+после запускайте скрипт для [Чтения](#чтения-чата) или [Отправки сообщения](#отправка-сообщения-в-чат). Пример установки в разделе [Video](#video)
+***
+### Чтение чата
+Для чтения и логирования чата Девман запустите скрипт: 
 
-`python3 listen-minechat.py --host 192.168.0.1 --port 5001 --history ~/minechat.history`
+`python listen-minechat.py`
 
 ```
 usage: listen_minechat.py [-h] [--host HOST] [--port PORT] [--history HISTORY]
 
-Скрипт для чтения и логгирования чата Devman
+Скрипт для чтения и логирования чата Devman
 
 optional arguments:
   -h, --help         show this help message and exit
@@ -17,12 +26,11 @@ optional arguments:
   --port PORT        port чата 
   --history HISTORY  Лог файл чата 
 ```
-
-## Отправка сообщения в чат
-
+***
+### Отправка сообщения в чат
 Для отправки сообщения в чат Девман запустите скрипт: 
 
-`python3 write_to_minechat.py HELLO_DEVMAN --host 192.168.0.1 --port 5001 --token asd123`
+`python write_to_minechat.py HELLO_DEVMAN`
 
 ```
 usage: write_to_minechat.py [-h] [--host HOST] [--port PORT] [--token TOKEN] [--name NAME] message
@@ -39,8 +47,7 @@ optional arguments:
   --token TOKEN  Токен [env var: TOKEN]
   --name NAME    Имя пользователя для регистрации
 ```
-
-
+***
 ### .env
 Для удобства параметры ниже можно добавить в окружение или передать через *.env* файл созданный в корне приложения
 ```
@@ -50,3 +57,12 @@ WRITE_PORT = 1234
 HISTORY = ./minechat.log
 TOKEN = abc123qwe456
 ```
+***
+### Requirements
+- [Python 3.8+](https://www.python.org/)
+- aiofiles==0.7.0
+- ConfigArgParse==1.5.1
+- python-dotenv==0.18.0
+***
+### Video
+[![asciicast](https://asciinema.org/a/426002.svg)](https://asciinema.org/a/426002)
