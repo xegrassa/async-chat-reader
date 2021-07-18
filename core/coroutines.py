@@ -1,6 +1,9 @@
 import asyncio
 import json
 import logging
+from typing import Tuple
+from contextlib import asynccontextmanager
+from asyncio import StreamReader, StreamWriter
 
 import aiofiles
 
@@ -9,7 +12,16 @@ from core.my_logging import configure_logging
 configure_logging(__name__)
 
 
-async def register_chat(host: str, port: str, name: str, token_path: str):
+async def register_in_chat(host: str, port: str, name: str, token_path: str):
+    """
+    Регистрация нового пользователя в чате и получение токена.
+
+    :param host: IP
+    :param port: Port
+    :param name: Имя пользователя
+    :param token_path: Путь до файла куда сохранить токен
+    :return: Токен
+    """
     reader, writer = await asyncio.open_connection(host, port)
     try:
         await read_message(reader)
@@ -58,3 +70,20 @@ async def submit_message(writer: asyncio.StreamWriter, message: str = ''):
     logger.debug(send_message)
     writer.write((send_message + '\n\n').encode())
     await writer.drain()
+
+
+@asynccontextmanager
+async def open_connection(host, port) -> Tuple[StreamReader, StreamWriter]:
+    """
+    Контекст для открытия Асинхронного соединения и последующее его закрытие.
+
+    :param host: IP
+    :param port: Port
+    :return: Reader, Writer
+    """
+    reader, writer = await asyncio.open_connection(host, port)
+    try:
+        yield reader, writer
+    finally:
+        writer.close()
+        await writer.wait_closed()
