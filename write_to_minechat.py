@@ -1,41 +1,61 @@
 import asyncio
-import json
 import logging
 
 from dotenv import load_dotenv
 
 from core.cli import parse_args_write
-from core.coroutines import register_in_chat, read_message, submit_message, open_connection
-from core.my_logging import configure_logging
+from core.coroutines.chatter import submit_message
+from core.coroutines.connect import open_connection
+from core.coroutines.files import write_token
+from core.coroutines.login import sign_up, sign_in
+from core.exceptions import InvalidTokenError
 
 TOKEN_PATH = 'token.txt'
-configure_logging(__name__)
+logger = logging.getLogger(__name__)
 
 
 async def write_to_chat(arguments):
-    logger = logging.getLogger(__name__)
     host, port = arguments.host, arguments.port
-    token, name = arguments.token, arguments.name
+    token, login = arguments.token, arguments.name
+
     if not token:
-        logger.info('Токен не найден. Попытка зарегистрировать нового пользователя')
-        token = await register_in_chat(host, port, name, TOKEN_PATH)
+        logger.info('Токен не найден. Регистрация нового пользователя')
+        async with open_connection(host, port) as conn:
+            token = await sign_up(conn, login)
+        logger.info(f'Регистрация под именем {login} завершена. Ваш токен {token}.')
+
+        await write_token(token, path=TOKEN_PATH)
 
     async with open_connection(host, port) as conn:
-        reader, writer = conn
-        await read_message(reader)
-        await submit_message(writer, token)
-
-        data = await read_message(reader)
-        if json.loads(data) is None:
-            print('Неизвестный токен. Проверьте его или зарегистрируйте заново.')
+        _, writer = conn
+        try:
+            await sign_in(conn, token)
+        except InvalidTokenError:
+            logger.error('Работа остановлена!!! Неизвестный токен, проверьте его или зарегистрируйте заново.')
             return
-        await read_message(reader)
 
         message = arguments.message
         await submit_message(writer, message)
 
 
-if __name__ == '__main__':
+def main():
     load_dotenv()
     args = parse_args_write()
     asyncio.run(write_to_chat(args))
+
+
+if __name__ == '__main__':
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(levelname)s:%(module)s:%(message)s')
+    ch.setFormatter(formatter)
+
+    logging.getLogger('core.coroutines.chatter').setLevel(logging.DEBUG)
+    logging.getLogger('core.coroutines.chatter').addHandler(ch)
+    logging.getLogger('core.coroutines.access').setLevel(logging.DEBUG)
+    logging.getLogger('core.coroutines.access').addHandler(ch)
+
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(ch)
+
+    main()

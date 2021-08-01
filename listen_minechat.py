@@ -2,12 +2,12 @@ import asyncio
 import datetime
 from pathlib import Path
 
-import aiofiles
 from dotenv import load_dotenv
 from requests import ConnectionError
 
 from core.cli import parse_args_listen
-from core.coroutines import open_connection
+from core.coroutines.connect import open_connection
+from core.coroutines.files import write_message
 
 
 async def read_chat(host, port, history):
@@ -23,8 +23,7 @@ async def read_chat(host, port, history):
                     message_time = datetime.datetime.now().strftime('[%d.%m.%y %H:%M]')
                     message = f'{message_time} {message_text}'
 
-                    async with aiofiles.open(history, mode='a', encoding='utf-8') as f:
-                        await f.write(message)
+                    await write_message(message, path=history)
                     print(message)
         except ConnectionError:
             if reconnect_count > 5:
