@@ -3,13 +3,12 @@ import logging
 
 from dotenv import load_dotenv
 
-from core.access_coroutines import sign_up, sign_in
-from core.chatter_coroutines import submit_message
 from core.cli import parse_args_write
+from core.coroutines.chatter import submit_message
+from core.coroutines.connect import open_connection
+from core.coroutines.files import write_token
+from core.coroutines.login import sign_up, sign_in
 from core.exceptions import InvalidTokenError
-from core.connect_coroutines import open_connection
-import aiofiles
-
 
 TOKEN_PATH = 'token.txt'
 logger = logging.getLogger(__name__)
@@ -17,19 +16,18 @@ logger = logging.getLogger(__name__)
 
 async def write_to_chat(arguments):
     host, port = arguments.host, arguments.port
-    token, name = arguments.token, arguments.name
+    token, login = arguments.token, arguments.name
+
+    if not token:
+        logger.info('Токен не найден. Регистрация нового пользователя')
+        async with open_connection(host, port) as conn:
+            token = await sign_up(conn, login)
+        logger.info(f'Регистрация под именем {login} завершена. Ваш токен {token}.')
+
+        await write_token(token, path=TOKEN_PATH)
+
     async with open_connection(host, port) as conn:
         _, writer = conn
-
-        if not token:
-            logger.info('Токен не найден. Регистрация нового пользователя')
-            token = await sign_up(conn, name)
-
-            async with aiofiles.open(TOKEN_PATH, 'w', encoding='utf-8') as f:
-                await f.write(f'token = {token}')
-
-            logger.info(f'Регистрация под именем {name} завершена. Ваш токен {token} будет использоваться для подключения')
-
         try:
             await sign_in(conn, token)
         except InvalidTokenError:
@@ -38,6 +36,12 @@ async def write_to_chat(arguments):
 
         message = arguments.message
         await submit_message(writer, message)
+
+
+def main():
+    load_dotenv()
+    args = parse_args_write()
+    asyncio.run(write_to_chat(args))
 
 
 if __name__ == '__main__':
@@ -54,6 +58,4 @@ if __name__ == '__main__':
     logger.setLevel(logging.DEBUG)
     logger.addHandler(ch)
 
-    load_dotenv()
-    args = parse_args_write()
-    asyncio.run(write_to_chat(args))
+    main()

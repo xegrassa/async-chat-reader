@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from requests import ConnectionError
 
 from core.cli import parse_args_listen
-from core.connect_coroutines import open_connection
+from core.coroutines.connect import open_connection
 
 
 async def read_chat(host, port, history):

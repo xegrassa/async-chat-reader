@@ -3,7 +3,7 @@ import logging
 from asyncio import StreamWriter, StreamReader
 from typing import Tuple
 
-from core.chatter_coroutines import read_message, submit_message
+from core.coroutines.chatter import read_message, submit_message
 from core.exceptions import InvalidTokenError
 
 logger = logging.getLogger(__name__)

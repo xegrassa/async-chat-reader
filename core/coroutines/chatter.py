@@ -12,7 +12,7 @@ async def submit_message(writer: StreamWriter, message: str = ''):
     :param message: Текст сообщения
     """
     send_message = message.replace('\n', '')
-    logger.debug(send_message)
+    logger.debug(f'SEND: {send_message}')
     writer.write((send_message + '\n\n').encode())
     await writer.drain()
 
@@ -25,5 +25,5 @@ async def read_message(reader: StreamReader) -> str:
     :return: Полученное Сообщение
     """
     response = await reader.readline()
-    logger.debug(response.decode())
+    logger.debug(f'READ: {response.decode()}')
     return response.decode()
