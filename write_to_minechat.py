@@ -50,10 +50,10 @@ if __name__ == '__main__':
     formatter = logging.Formatter('%(levelname)s:%(module)s:%(message)s')
     ch.setFormatter(formatter)
 
-    logging.getLogger('core.chatter_coroutines').setLevel(logging.DEBUG)
-    logging.getLogger('core.chatter_coroutines').addHandler(ch)
-    logging.getLogger('core.access_coroutines').setLevel(logging.DEBUG)
-    logging.getLogger('core.access_coroutines').addHandler(ch)
+    logging.getLogger('core.coroutines.chatter').setLevel(logging.DEBUG)
+    logging.getLogger('core.coroutines.chatter').addHandler(ch)
+    logging.getLogger('core.coroutines.access').setLevel(logging.DEBUG)
+    logging.getLogger('core.coroutines.access').addHandler(ch)
 
     logger.setLevel(logging.DEBUG)
     logger.addHandler(ch)
